@@ -45,7 +45,6 @@ const Landing = () => {
   const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(null);
-  const [theme, setTheme] = useState("cobalt");
   const [language, setLanguage] = useState(languageOptions[0]);
 
   const enterPress = useKeyPress("Enter");
@@ -87,7 +86,7 @@ const Landing = () => {
   };
 
   return (
-    <>
+    <div className="">
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -99,8 +98,6 @@ const Landing = () => {
         draggable
         pauseOnHover
       />
-
-      <div className="h-4 w-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"></div>
       <div className="flex flex-row">
         <div className="px-4 py-2">
           <LanguagesDropdown onSelectChange={onSelectChange} />
@@ -125,17 +122,17 @@ const Landing = () => {
             <button
               disabled={!code}
               className={(
-                "mt-4 border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0" +
+                "mt-4 border-2 border-gray-500 z-10 rounded-md px-4 py-2 hover:shadow transition duration-200 bg-slate-100 flex-shrink-0" +
                 (!code ? " opacity-50" : "")
               )}
             >
-              {processing ? "Processing..." : "Compile and Execute"}
+              {processing ? "Processing..." : " Lets compile!"}
             </button>
           </div>
           {outputDetails && <OutputDetails outputDetails={outputDetails} />}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 export default Landing;
