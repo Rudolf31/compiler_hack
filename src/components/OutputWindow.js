@@ -1,6 +1,10 @@
 import React from "react";
 
-const OutputWindow = ({ outputDetails }) => {
+const OutputWindow = ({ outputDetails, isAnonymous }) => {
+
+  const darkOut = "w-full h-56 bg-slate-800 rounded-md text-white font-normal text-sm overflow-y-auto";
+  const whiteOut = "w-full h-56 bg-slate-200 rounded-md text-dark font-normal text-sm overflow-y-auto";
+
   const getOutput = () => {
     let statusId = outputDetails?.status?.id;
 
@@ -38,7 +42,7 @@ const OutputWindow = ({ outputDetails }) => {
       <h1 className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 mb-2">
         Output
       </h1>
-      <div className="w-full h-56 bg-slate-800 rounded-md text-white font-normal text-sm overflow-y-auto">
+      <div className={`${isAnonymous ? darkOut : whiteOut}`}>
         {outputDetails ? <>{getOutput()}</> : null}
       </div>
     </>

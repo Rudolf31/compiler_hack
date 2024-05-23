@@ -6,9 +6,26 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useKeyPress from "../hooks/useKeyPress";
 import OutputWindow from "./OutputWindow";
-import CustomInput from "./CustomInput";
 import OutputDetails from "./OutputDetails";
 import LanguagesDropdown from "./LanguagesDropdown";
+import AnonymityButton from "./AnonymityButton";
+import HeaderComponent from "./Header"
+
+
+axios.post('http://localhost:8080/api/predict/getSample', {
+  name: "user",
+  data: "public static void helloWorld()",
+  isSaveMode: false
+})
+  .then(response => {
+    // Handle success
+    console.log(response.data);
+  })
+  .catch(error => {
+    // Handle error
+    console.error(error);
+  });
+
 
 const javascriptDefault = `/**
 * Problem: Binary Search: Search a sorted array for a target value.
@@ -46,6 +63,7 @@ const Landing = () => {
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(null);
   const [language, setLanguage] = useState(languageOptions[0]);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
@@ -85,8 +103,49 @@ const Landing = () => {
     });
   };
 
+  const [Msg, setMsg] = useState('');
+
+  useEffect(() => {
+    let ws = new WebSocket('ws://localhost:8080'); // Подключение к WebSocket серверу
+
+    ws.onopen = () => {
+        console.log('WebSocket соединение установлено');
+    };
+
+    ws.onmessage = (event) => {
+        const message = event.data;
+        setMsg(message);
+    };
+
+    ws.onclose = () => {
+        console.log('WebSocket соединение закрыто');
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket ошибка:', error);
+    };
+
+    return () => {
+        ws.close(); // Закрытие WebSocket соединения при размонтировании компонента
+    };
+}, []); // Пустой массив зависимостей для запуска useEffect только один раз
+
+
+    server.on('error', (err) => {
+        console.error('Server error:', err);
+    });
+
+    server.listen(PORT, () => {
+        console.log('Server listening on port ${PORT}');
+    });
+})
+
+
+
+
   return (
-    <div className="">
+    <div className={`${isAnonymous ? 'bg-gray-300' : 'bg-gray-50'} h-screen`}>
+      <HeaderComponent isAnonymous={isAnonymous} />
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -102,28 +161,32 @@ const Landing = () => {
         <div className="px-4 py-2">
           <LanguagesDropdown onSelectChange={onSelectChange} />
         </div>
+        <div className="px-4 py-2 flex flex-col justify-center">
+          <AnonymityButton isAnonymous={isAnonymous} setIsAnonymous={setIsAnonymous}/>
+        </div>
       </div>
       <div className="flex flex-row space-x-4 items-start px-4 py-4">
-        <div className="flex flex-col w-full h-full justify-start items-end">
-          <CodeEditorWindow
+        <div className="flex h-full w-full justify-start items-end gap-4">
+          <CodeEditorWindow isAnonymous={isAnonymous}
             code={code}
             onChange={onChange}
             language={language?.value}
           />
+          <CodeEditorWindow isAnonymous={isAnonymous}
+            
+            onChange={onChange}
+            language={language?.value}
+            />
         </div>
 
         <div className="right-container flex flex-shrink-0 w-[30%] flex-col">
-          <OutputWindow outputDetails={outputDetails} />
+          <OutputWindow outputDetails={outputDetails} isAnonymous={isAnonymous}/>
           <div className="flex flex-col items-end">
-            <CustomInput
-              customInput={customInput}
-              setCustomInput={setCustomInput}
-            />
             <button
               disabled={!code}
               className={(
-                "mt-4 border-2 border-gray-500 z-10 rounded-md px-4 py-2 hover:shadow transition duration-200 bg-slate-100 flex-shrink-0" +
-                (!code ? " opacity-50" : "")
+                "mt-4 border-2 border-gray-500 z-10 rounded-md px-4 py-2 hover:shadow transition duration-200 flex-shrink-0" +
+                (!code ? " opacity-50" : "") + `${isAnonymous ? ' bg-slate-800 text-white' : ' bg-slate-100 text-black'}`
               )}
             >
               {processing ? "Processing..." : " Lets compile!"}
